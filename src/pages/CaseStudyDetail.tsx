@@ -1,13 +1,25 @@
 
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { getCaseStudyBySlug } from '@/data/mockData';
+import React, { useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { getCaseStudyBySlug, getUserByUsername } from '@/data/mockData';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 const CaseStudyDetail = () => {
-  const { slug } = useParams<{ slug: string; username: string }>();
+  const { slug, username } = useParams<{ slug: string; username: string }>();
+  const { user } = useAuth();
   const caseStudy = getCaseStudyBySlug(slug || '');
+  const portfolioUser = getUserByUsername(username || '');
   
-  if (!caseStudy) {
+  // Track page view - would integrate with real analytics in a production app
+  useEffect(() => {
+    console.log(`Tracking view for case study: ${slug}`);
+    // In a real app, we would call an API to record the view
+  }, [slug]);
+  
+  const isOwner = user?.username === username;
+  
+  if (!caseStudy || !portfolioUser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -33,6 +45,20 @@ const CaseStudyDetail = () => {
   
   return (
     <div className="min-h-screen pb-16">
+      {/* Admin toolbar for owner */}
+      {isOwner && (
+        <div className="bg-secondary py-2 px-4">
+          <div className="container-custom flex justify-between items-center">
+            <p className="text-sm">You are viewing your published case study</p>
+            <Link to={`/dashboard/case-studies/edit/${caseStudy.id}`}>
+              <Button variant="outline" size="sm">
+                Edit Case Study
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+      
       {/* Hero Section */}
       <section className="relative py-20">
         {caseStudy.coverImage && (
@@ -100,6 +126,7 @@ const CaseStudyDetail = () => {
               <div>
                 <h3 className="font-medium text-lg mb-2">Project Details</h3>
                 <p className="text-muted-foreground">Published on {formattedDate}</p>
+                <p className="text-muted-foreground">By <Link to={`/${username}`} className="text-primary hover:underline">{portfolioUser.name}</Link></p>
               </div>
             </div>
           </section>
@@ -214,7 +241,7 @@ const CaseStudyDetail = () => {
                 <p className="text-muted-foreground">Let's discuss your next project!</p>
               </div>
               <a 
-                href="mailto:hello@example.com"
+                href={`mailto:${portfolioUser.email || 'hello@example.com'}`}
                 className="px-6 py-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Get in Touch

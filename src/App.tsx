@@ -14,6 +14,8 @@ import Register from "@/pages/Register";
 import Dashboard from "@/pages/Dashboard";
 import Analytics from "@/pages/Analytics";
 import CaseStudies from "@/pages/CaseStudies";
+import CreateCaseStudy from "@/pages/CreateCaseStudy";
+import EditCaseStudy from "@/pages/EditCaseStudy";
 import Portfolio from "@/pages/Portfolio";
 import Settings from "@/pages/Settings";
 import UserPortfolio from "@/pages/UserPortfolio";
@@ -40,6 +42,8 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/analytics" element={<Analytics />} />
               <Route path="/dashboard/case-studies" element={<CaseStudies />} />
+              <Route path="/dashboard/case-studies/new" element={<CreateCaseStudy />} />
+              <Route path="/dashboard/case-studies/edit/:id" element={<EditCaseStudy />} />
               <Route path="/dashboard/portfolio" element={<Portfolio />} />
               <Route path="/dashboard/settings" element={<Settings />} />
               

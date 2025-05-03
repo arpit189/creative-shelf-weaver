@@ -3,6 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavItem {
   title: string;
@@ -12,6 +13,7 @@ interface NavItem {
 
 const DashboardSidebar = () => {
   const location = useLocation();
+  const { user } = useAuth();
 
   const navItems: NavItem[] = [
     {
@@ -99,7 +101,7 @@ const DashboardSidebar = () => {
         </nav>
       </div>
       <div className="p-4 border-t border-border">
-        <Link to="/preview">
+        <Link to={`/${user?.username || 'demo'}`}>
           <Button variant="outline" size="sm" className="w-full">
             <svg
               xmlns="http://www.w3.org/2000/svg"

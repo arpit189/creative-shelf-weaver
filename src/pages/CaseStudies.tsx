@@ -7,8 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import CaseStudyCard from '@/components/portfolio/CaseStudyCard';
 import { mockCaseStudies } from '@/data/mockData';
+import { useAuth } from '@/contexts/AuthContext';
 
 const CaseStudies = () => {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const userCaseStudies = mockCaseStudies.filter(cs => cs.userId === 'user1'); // Hardcoded for demo
 
@@ -49,17 +51,26 @@ const CaseStudies = () => {
           {filteredCaseStudies.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCaseStudies.map((caseStudy) => (
-                <CaseStudyCard
-                  key={caseStudy.id}
-                  id={caseStudy.id}
-                  title={caseStudy.title}
-                  excerpt={caseStudy.excerpt}
-                  coverImage={caseStudy.coverImage}
-                  tags={caseStudy.tags}
-                  createdAt={caseStudy.createdAt}
-                  slug={caseStudy.slug}
-                  username="sarahdesigner" // Hardcoded for demo
-                />
+                <div key={caseStudy.id} className="group relative">
+                  <CaseStudyCard
+                    id={caseStudy.id}
+                    title={caseStudy.title}
+                    excerpt={caseStudy.excerpt}
+                    coverImage={caseStudy.coverImage}
+                    tags={caseStudy.tags}
+                    createdAt={caseStudy.createdAt}
+                    slug={caseStudy.slug}
+                    username={user?.username || "demo"}
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Link to={`/dashboard/case-studies/edit/${caseStudy.id}`} className="bg-white p-2 rounded-full shadow-md">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
@@ -81,17 +92,26 @@ const CaseStudies = () => {
             {userCaseStudies.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {userCaseStudies.map((caseStudy) => (
-                  <CaseStudyCard
-                    key={caseStudy.id}
-                    id={caseStudy.id}
-                    title={caseStudy.title}
-                    excerpt={caseStudy.excerpt}
-                    coverImage={caseStudy.coverImage}
-                    tags={caseStudy.tags}
-                    createdAt={caseStudy.createdAt}
-                    slug={caseStudy.slug}
-                    username="sarahdesigner" // Hardcoded for demo
-                  />
+                  <div key={caseStudy.id} className="group relative">
+                    <CaseStudyCard
+                      id={caseStudy.id}
+                      title={caseStudy.title}
+                      excerpt={caseStudy.excerpt}
+                      coverImage={caseStudy.coverImage}
+                      tags={caseStudy.tags}
+                      createdAt={caseStudy.createdAt}
+                      slug={caseStudy.slug}
+                      username={user?.username || "demo"}
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Link to={`/dashboard/case-studies/edit/${caseStudy.id}`} className="bg-white p-2 rounded-full shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 20h9" />
+                          <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                        </svg>
+                      </Link>
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : (
@@ -115,17 +135,26 @@ const CaseStudies = () => {
             {featuredCaseStudies.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {featuredCaseStudies.map((caseStudy) => (
-                  <CaseStudyCard
-                    key={caseStudy.id}
-                    id={caseStudy.id}
-                    title={caseStudy.title}
-                    excerpt={caseStudy.excerpt}
-                    coverImage={caseStudy.coverImage}
-                    tags={caseStudy.tags}
-                    createdAt={caseStudy.createdAt}
-                    slug={caseStudy.slug}
-                    username="sarahdesigner" // Hardcoded for demo
-                  />
+                  <div key={caseStudy.id} className="group relative">
+                    <CaseStudyCard
+                      id={caseStudy.id}
+                      title={caseStudy.title}
+                      excerpt={caseStudy.excerpt}
+                      coverImage={caseStudy.coverImage}
+                      tags={caseStudy.tags}
+                      createdAt={caseStudy.createdAt}
+                      slug={caseStudy.slug}
+                      username={user?.username || "demo"}
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Link to={`/dashboard/case-studies/edit/${caseStudy.id}`} className="bg-white p-2 rounded-full shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 20h9" />
+                          <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                        </svg>
+                      </Link>
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : (
@@ -140,17 +169,26 @@ const CaseStudies = () => {
             {draftCaseStudies.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {draftCaseStudies.map((caseStudy) => (
-                  <CaseStudyCard
-                    key={caseStudy.id}
-                    id={caseStudy.id}
-                    title={caseStudy.title}
-                    excerpt={caseStudy.excerpt}
-                    coverImage={caseStudy.coverImage}
-                    tags={caseStudy.tags}
-                    createdAt={caseStudy.createdAt}
-                    slug={caseStudy.slug}
-                    username="sarahdesigner" // Hardcoded for demo
-                  />
+                  <div key={caseStudy.id} className="group relative">
+                    <CaseStudyCard
+                      id={caseStudy.id}
+                      title={caseStudy.title}
+                      excerpt={caseStudy.excerpt}
+                      coverImage={caseStudy.coverImage}
+                      tags={caseStudy.tags}
+                      createdAt={caseStudy.createdAt}
+                      slug={caseStudy.slug}
+                      username={user?.username || "demo"}
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Link to={`/dashboard/case-studies/edit/${caseStudy.id}`} className="bg-white p-2 rounded-full shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 20h9" />
+                          <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                        </svg>
+                      </Link>
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : (
