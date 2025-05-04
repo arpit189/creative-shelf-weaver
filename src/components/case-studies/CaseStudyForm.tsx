@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
+import { toast as sonnerToast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +11,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
+import { getCaseStudyById, mockCaseStudies } from '@/data/mockData';
 
 interface TimelineItem {
   title: string;
@@ -33,35 +35,54 @@ const CaseStudyForm: React.FC<CaseStudyFormProps> = ({ editMode = false, caseStu
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // Find case study for edit mode
+  const caseStudyToEdit = editMode && caseStudyId ? 
+    mockCaseStudies.find(cs => cs.id === caseStudyId) : undefined;
+
   // Basic info state
-  const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
-  const [excerpt, setExcerpt] = useState('');
-  const [coverImage, setCoverImage] = useState('');
-  const [projectOverview, setProjectOverview] = useState('');
-  const [featured, setFeatured] = useState(false);
+  const [title, setTitle] = useState(caseStudyToEdit?.title || '');
+  const [slug, setSlug] = useState(caseStudyToEdit?.slug || '');
+  const [excerpt, setExcerpt] = useState(caseStudyToEdit?.excerpt || '');
+  const [coverImage, setCoverImage] = useState(caseStudyToEdit?.coverImage || '');
+  const [projectOverview, setProjectOverview] = useState(caseStudyToEdit?.projectOverview || '');
+  const [featured, setFeatured] = useState(caseStudyToEdit?.featured || false);
   
   // Tags state
-  const [tagsInput, setTagsInput] = useState('');
-  const [tools, setTools] = useState('');
+  const [tagsInput, setTagsInput] = useState(caseStudyToEdit?.tags?.join(', ') || '');
+  const [tools, setTools] = useState(caseStudyToEdit?.tools?.join(', ') || '');
 
   // Gallery state
-  const [galleryUrls, setGalleryUrls] = useState<string[]>(['']);
+  const [galleryUrls, setGalleryUrls] = useState<string[]>(
+    caseStudyToEdit?.gallery?.length ? caseStudyToEdit.gallery : ['']
+  );
 
   // Timeline state
-  const [timeline, setTimeline] = useState<TimelineItem[]>([{ 
-    title: '', 
-    date: '', 
-    description: '' 
-  }]);
+  const [timeline, setTimeline] = useState<TimelineItem[]>(
+    caseStudyToEdit?.timeline?.length ? 
+    caseStudyToEdit.timeline.map(item => ({
+      title: item.title,
+      date: item.date,
+      description: item.description
+    })) : 
+    [{ title: '', date: '', description: '' }]
+  );
 
   // Outcomes state
-  const [metrics, setMetrics] = useState<string[]>(['']);
-  const [testimonials, setTestimonials] = useState<TestimonialItem[]>([{
-    author: '',
-    position: '',
-    content: ''
-  }]);
+  const [metrics, setMetrics] = useState<string[]>(
+    caseStudyToEdit?.outcomes?.metrics?.length ? 
+    caseStudyToEdit.outcomes.metrics : 
+    ['']
+  );
+  
+  const [testimonials, setTestimonials] = useState<TestimonialItem[]>(
+    caseStudyToEdit?.outcomes?.testimonials?.length ?
+    caseStudyToEdit.outcomes.testimonials.map(item => ({
+      author: item.author,
+      position: item.position || '',
+      content: item.content
+    })) :
+    [{ author: '', position: '', content: '' }]
+  );
 
   // Handle gallery inputs
   const handleGalleryChange = (index: number, value: string) => {
@@ -166,6 +187,11 @@ const CaseStudyForm: React.FC<CaseStudyFormProps> = ({ editMode = false, caseStu
       description: `"${title}" has been ${editMode ? "updated" : "created"} successfully.`,
     });
     
+    sonnerToast.success(
+      editMode ? "Case study updated" : "Case study created", 
+      {description: `"${title}" has been ${editMode ? "updated" : "created"} successfully.`}
+    );
+
     navigate('/dashboard/case-studies');
   };
 

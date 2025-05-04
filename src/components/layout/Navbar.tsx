@@ -4,7 +4,11 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
-const Navbar = () => {
+interface NavbarProps {
+  showLoginLinks?: boolean;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ showLoginLinks = true }) => {
   const { user, isAuthenticated, logout } = useAuth();
 
   return (
@@ -29,12 +33,16 @@ const Navbar = () => {
         <div className="flex items-center space-x-4">
           {!isAuthenticated ? (
             <>
-              <Link to="/login">
-                <Button variant="outline" size="sm">Sign In</Button>
-              </Link>
-              <Link to="/register">
-                <Button size="sm">Get Started</Button>
-              </Link>
+              {showLoginLinks && (
+                <>
+                  <Link to="/login">
+                    <Button variant="outline" size="sm">Sign In</Button>
+                  </Link>
+                  <Link to="/register">
+                    <Button size="sm">Get Started</Button>
+                  </Link>
+                </>
+              )}
             </>
           ) : (
             <>
@@ -42,7 +50,7 @@ const Navbar = () => {
                 <Button variant="outline" size="sm">Dashboard</Button>
               </Link>
               <Link to={`/${user?.username}`}>
-                <Button variant="ghost" size="sm">{user?.name}</Button>
+                <Button variant="ghost" size="sm">View Portfolio</Button>
               </Link>
               <Button variant="ghost" size="sm" onClick={logout}>
                 Log Out

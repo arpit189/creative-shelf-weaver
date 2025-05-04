@@ -360,6 +360,10 @@ export const getCaseStudyBySlug = (slug: string): CaseStudy | undefined => {
   return mockCaseStudies.find(caseStudy => caseStudy.slug === slug);
 };
 
+export const getCaseStudyById = (id: string): CaseStudy | undefined => {
+  return mockCaseStudies.find(caseStudy => caseStudy.id === id);
+};
+
 export const getPortfolioByUserId = (userId: string): Portfolio | undefined => {
   return mockPortfolios.find(portfolio => portfolio.userId === userId);
 };

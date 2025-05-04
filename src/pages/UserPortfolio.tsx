@@ -1,18 +1,23 @@
 
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import CaseStudyCard from '@/components/portfolio/CaseStudyCard';
+import Layout from '@/components/layout/Layout';
+import { Button } from '@/components/ui/button';
 import { getUserByUsername, getCaseStudiesByUserId, getPortfolioByUserId } from '@/data/mockData';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const UserPortfolio = () => {
   const { username } = useParams<{ username: string }>();
+  const { user: currentUser } = useAuth();
   const { setTheme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const user = getUserByUsername(username || '');
+  const portfolioUser = getUserByUsername(username || '');
+  const isOwner = currentUser?.id === portfolioUser?.id;
   
   useEffect(() => {
     if (!username) {
@@ -21,13 +26,13 @@ const UserPortfolio = () => {
       return;
     }
     
-    if (!user) {
+    if (!portfolioUser) {
       setError('User not found');
       setLoading(false);
       return;
     }
     
-    const portfolio = getPortfolioByUserId(user.id);
+    const portfolio = getPortfolioByUserId(portfolioUser.id);
     
     // Set theme based on portfolio settings
     if (portfolio) {
@@ -35,7 +40,7 @@ const UserPortfolio = () => {
     }
     
     setLoading(false);
-  }, [username, user, setTheme]);
+  }, [username, portfolioUser, setTheme]);
   
   if (loading) {
     return (
@@ -45,7 +50,7 @@ const UserPortfolio = () => {
     );
   }
   
-  if (error || !user) {
+  if (error || !portfolioUser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -63,28 +68,49 @@ const UserPortfolio = () => {
     );
   }
   
-  const portfolio = getPortfolioByUserId(user.id);
-  const caseStudies = getCaseStudiesByUserId(user.id);
+  const portfolio = getPortfolioByUserId(portfolioUser.id);
+  const caseStudies = getCaseStudiesByUserId(portfolioUser.id);
   
   return (
-    <div className="min-h-screen">
+    <Layout hideFooter>
+      {/* Admin toolbar for owner */}
+      {isOwner && (
+        <div className="bg-secondary py-2 px-4">
+          <div className="container-custom flex justify-between items-center">
+            <p className="text-sm">You are viewing your public portfolio</p>
+            <div className="flex space-x-4">
+              <Link to="/dashboard/portfolio">
+                <Button variant="outline" size="sm">
+                  Edit Portfolio
+                </Button>
+              </Link>
+              <Link to="/dashboard/case-studies">
+                <Button variant="outline" size="sm">
+                  Manage Case Studies
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Hero Section */}
       <section className="py-20 md:py-32 border-b">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-              {user.avatar && (
+              {portfolioUser.avatar && (
                 <div className="shrink-0">
                   <img 
-                    src={user.avatar} 
-                    alt={user.name}
+                    src={portfolioUser.avatar} 
+                    alt={portfolioUser.name}
                     className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover"
                   />
                 </div>
               )}
               
               <div className="text-center md:text-left">
-                <h1 className="heading-xl mb-4">{user.name}</h1>
+                <h1 className="text-4xl md:text-5xl font-bold mb-4">{portfolioUser.name}</h1>
                 <p className="text-xl text-muted-foreground mb-6">{portfolio?.description}</p>
                 
                 <div className="flex flex-wrap gap-2">
@@ -107,7 +133,7 @@ const UserPortfolio = () => {
       <section className="py-16">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto">
-            <h2 className="heading-md mb-8">Featured Case Studies</h2>
+            <h2 className="text-3xl font-bold mb-8">Featured Case Studies</h2>
             
             {caseStudies.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -129,6 +155,14 @@ const UserPortfolio = () => {
               <Card>
                 <CardContent className="py-10 text-center">
                   <p className="text-muted-foreground">No case studies yet.</p>
+                  
+                  {isOwner && (
+                    <div className="mt-4">
+                      <Link to="/dashboard/case-studies/new">
+                        <Button>Create Your First Case Study</Button>
+                      </Link>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -140,15 +174,15 @@ const UserPortfolio = () => {
       <section className="py-16 bg-muted/30">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto">
-            <h2 className="heading-md mb-8">About Me</h2>
+            <h2 className="text-3xl font-bold mb-8">About Me</h2>
             
             <div className="prose max-w-none">
-              <p className="text-lg mb-6">{user.bio}</p>
+              <p className="text-lg mb-6">{portfolioUser.bio}</p>
               
-              {user.location && (
+              {portfolioUser.location && (
                 <div className="mb-6">
                   <h3 className="text-lg font-medium mb-2">Location</h3>
-                  <p>{user.location}</p>
+                  <p>{portfolioUser.location}</p>
                 </div>
               )}
               
@@ -166,13 +200,13 @@ const UserPortfolio = () => {
                 </div>
               )}
               
-              {(user.website || user.social) && (
+              {(portfolioUser.website || portfolioUser.social) && (
                 <div>
                   <h3 className="text-lg font-medium mb-2">Connect</h3>
                   <div className="flex flex-wrap gap-4">
-                    {user.website && (
+                    {portfolioUser.website && (
                       <a 
-                        href={user.website}
+                        href={portfolioUser.website}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
@@ -180,9 +214,9 @@ const UserPortfolio = () => {
                         Website
                       </a>
                     )}
-                    {user.social?.twitter && (
+                    {portfolioUser.social?.twitter && (
                       <a 
-                        href={`https://twitter.com/${user.social.twitter}`}
+                        href={`https://twitter.com/${portfolioUser.social.twitter}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
@@ -190,9 +224,9 @@ const UserPortfolio = () => {
                         Twitter
                       </a>
                     )}
-                    {user.social?.linkedin && (
+                    {portfolioUser.social?.linkedin && (
                       <a 
-                        href={`https://linkedin.com/in/${user.social.linkedin}`}
+                        href={`https://linkedin.com/in/${portfolioUser.social.linkedin}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
@@ -200,9 +234,9 @@ const UserPortfolio = () => {
                         LinkedIn
                       </a>
                     )}
-                    {user.social?.github && (
+                    {portfolioUser.social?.github && (
                       <a 
-                        href={`https://github.com/${user.social.github}`}
+                        href={`https://github.com/${portfolioUser.social.github}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
@@ -210,9 +244,9 @@ const UserPortfolio = () => {
                         GitHub
                       </a>
                     )}
-                    {user.social?.dribbble && (
+                    {portfolioUser.social?.dribbble && (
                       <a 
-                        href={`https://dribbble.com/${user.social.dribbble}`}
+                        href={`https://dribbble.com/${portfolioUser.social.dribbble}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
@@ -220,9 +254,9 @@ const UserPortfolio = () => {
                         Dribbble
                       </a>
                     )}
-                    {user.social?.behance && (
+                    {portfolioUser.social?.behance && (
                       <a 
-                        href={`https://behance.net/${user.social.behance}`}
+                        href={`https://behance.net/${portfolioUser.social.behance}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
@@ -246,7 +280,7 @@ const UserPortfolio = () => {
           </div>
         </div>
       </footer>
-    </div>
+    </Layout>
   );
 };
 

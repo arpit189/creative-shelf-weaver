@@ -3,11 +3,11 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import CaseStudyForm from '@/components/case-studies/CaseStudyForm';
-import { getCaseStudyById } from '@/data/mockData';
+import { getCaseStudyBySlug } from '@/data/mockData';
 
 const EditCaseStudy = () => {
   const { id } = useParams<{ id: string }>();
-  const caseStudy = getCaseStudyById(id || '');
+  const caseStudy = getCaseStudyBySlug(id || '');
   
   if (!caseStudy) {
     return (
@@ -22,7 +22,7 @@ const EditCaseStudy = () => {
   
   return (
     <DashboardLayout title={`Edit: ${caseStudy.title}`}>
-      <CaseStudyForm editMode caseStudyId={id} />
+      <CaseStudyForm editMode caseStudyId={caseStudy.id} />
     </DashboardLayout>
   );
 };
