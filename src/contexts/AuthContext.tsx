@@ -3,9 +3,20 @@ import React, { createContext, useState, useContext, useEffect, ReactNode } from
 
 interface User {
   id: string;
-  username: string;
+  username?: string;
   email: string;
   name: string;
+  avatar?: string;
+  bio?: string;
+  location?: string;
+  website?: string;
+  social?: {
+    twitter?: string;
+    linkedin?: string;
+    github?: string;
+    dribbble?: string;
+    behance?: string;
+  };
 }
 
 interface AuthContextType {
@@ -13,8 +24,9 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, password: string, username: string, name: string) => Promise<boolean>;
+  register: (email: string, password: string, username?: string, name?: string) => Promise<boolean>;
   logout: () => void;
+  updateProfile: (data: Partial<User>) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -36,12 +48,23 @@ const mockLogin = (email: string, password: string): Promise<User | null> => {
   // This is a mock for demonstration purposes
   return new Promise((resolve) => {
     setTimeout(() => {
-      if (email === 'demo@example.com' && password === 'password') {
+      if ((email === 'demo@example.com' && password === 'password') || password === 'demo') {
+        // Convert email to a valid username format for URLs
+        const usernameFromEmail = email.split('@')[0];
+        
         resolve({
           id: '1',
-          username: 'demouser',
-          email: 'demo@example.com',
-          name: 'Demo User'
+          username: usernameFromEmail,
+          email: email,
+          name: usernameFromEmail.charAt(0).toUpperCase() + usernameFromEmail.slice(1),
+          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+          bio: 'Designer and developer passionate about creating beautiful, functional web applications.',
+          location: 'San Francisco, CA',
+          website: 'https://example.com',
+          social: {
+            twitter: 'designerdemo',
+            github: 'demodeveloper',
+          }
         });
       } else {
         resolve(null);
@@ -50,15 +73,19 @@ const mockLogin = (email: string, password: string): Promise<User | null> => {
   });
 };
 
-const mockRegister = (email: string, password: string, username: string, name: string): Promise<User | null> => {
+const mockRegister = (email: string, password: string, username?: string, name?: string): Promise<User | null> => {
   // This is a mock for demonstration purposes
   return new Promise((resolve) => {
     setTimeout(() => {
+      const usernameFromEmail = username || email.split('@')[0];
+      const nameFromEmail = name || (usernameFromEmail.charAt(0).toUpperCase() + usernameFromEmail.slice(1));
+      
       resolve({
         id: '2',
-        username,
+        username: usernameFromEmail,
         email,
-        name
+        name: nameFromEmail,
+        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
       });
     }, 1000);
   });
@@ -97,7 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const register = async (email: string, password: string, username: string, name: string) => {
+  const register = async (email: string, password: string, username?: string, name?: string) => {
     setIsLoading(true);
     try {
       const user = await mockRegister(email, password, username, name);
@@ -122,6 +149,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('projectShelfUser');
   };
 
+  const updateProfile = async (data: Partial<User>) => {
+    if (!user) return false;
+    
+    try {
+      // In a real app, we would call an API here
+      const updatedUser = { ...user, ...data };
+      setUser(updatedUser);
+      localStorage.setItem('projectShelfUser', JSON.stringify(updatedUser));
+      return true;
+    } catch (error) {
+      console.error('Profile update error:', error);
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -129,7 +171,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       isLoading,
       login,
       register,
-      logout
+      logout,
+      updateProfile
     }}>
       {children}
     </AuthContext.Provider>

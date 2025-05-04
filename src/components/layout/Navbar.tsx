@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { LogIn, UserPlus, User } from 'lucide-react';
 
 interface NavbarProps {
   showLoginLinks?: boolean;
@@ -11,8 +12,10 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ showLoginLinks = true }) => {
   const { user, isAuthenticated, logout } = useAuth();
   
-  // Make sure we have a valid username to use
-  const username = user?.username || 'demo';
+  // Make sure we have a valid username to use - convert email format to valid URL
+  const username = user?.username ? user.username : 
+                  user?.email ? user.email.replace('@', '-at-').replace(/\./g, '-') : 
+                  'demo';
 
   return (
     <header className="border-b border-border">
@@ -39,10 +42,16 @@ const Navbar: React.FC<NavbarProps> = ({ showLoginLinks = true }) => {
               {showLoginLinks && (
                 <>
                   <Link to="/login">
-                    <Button variant="outline" size="sm">Sign In</Button>
+                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                      <LogIn className="h-4 w-4" />
+                      Sign In
+                    </Button>
                   </Link>
                   <Link to="/register">
-                    <Button size="sm">Get Started</Button>
+                    <Button size="sm" className="flex items-center gap-2">
+                      <UserPlus className="h-4 w-4" />
+                      Get Started
+                    </Button>
                   </Link>
                 </>
               )}
@@ -53,7 +62,10 @@ const Navbar: React.FC<NavbarProps> = ({ showLoginLinks = true }) => {
                 <Button variant="outline" size="sm">Dashboard</Button>
               </Link>
               <Link to={`/${username}`}>
-                <Button variant="ghost" size="sm">View Portfolio</Button>
+                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  View Portfolio
+                </Button>
               </Link>
               <Button variant="ghost" size="sm" onClick={logout}>
                 Log Out

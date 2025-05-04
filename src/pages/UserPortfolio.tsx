@@ -17,12 +17,23 @@ const UserPortfolio = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  // Handle the username from the URL
+  // If it includes "-at-" it's likely an email format
+  const formattedUsername = username?.includes('-at-') 
+    ? username.replace('-at-', '@').replace(/-/g, '.') 
+    : username;
+  
   // Always default to demo user if no username is provided or if the username doesn't match any user
-  const safeUsername = username || 'demo';
+  const safeUsername = formattedUsername || 'demo';
   
   // Get the user data based on the username - fallback to first demo user if not found
-  const portfolioUser = getUserByUsername(safeUsername) || mockUsers[0]; // Use first mock user as fallback
-  const isOwner = currentUser?.id === portfolioUser?.id;
+  // Check if the user matches by username, email, or id
+  const portfolioUser = getUserByUsername(safeUsername) || 
+                        mockUsers.find(u => u.email === safeUsername) || 
+                        mockUsers[0]; // Use first mock user as fallback
+  
+  const isOwner = currentUser?.id === portfolioUser?.id || 
+                 currentUser?.email === portfolioUser?.email;
   
   useEffect(() => {
     // Always get a portfolio, either the real one or the demo
@@ -47,6 +58,10 @@ const UserPortfolio = () => {
   // Get portfolio and case studies
   const portfolio = getPortfolioByUserId(portfolioUser.id);
   const caseStudies = getCaseStudiesByUserId(portfolioUser.id);
+  
+  // Format display username - remove email formatting for display if needed
+  const displayUsername = portfolioUser.username || 
+                         (portfolioUser.email ? portfolioUser.email.split('@')[0] : 'Demo User');
   
   return (
     <Layout hideFooter>
@@ -87,7 +102,7 @@ const UserPortfolio = () => {
               )}
               
               <div className="text-center md:text-left">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4">{portfolioUser.name}</h1>
+                <h1 className="text-4xl md:text-5xl font-bold mb-4">{portfolioUser.name || displayUsername}</h1>
                 <p className="text-xl text-muted-foreground mb-6">{portfolio?.description || "Designer & Developer"}</p>
                 
                 <div className="flex flex-wrap gap-2">
@@ -124,7 +139,7 @@ const UserPortfolio = () => {
                     tags={caseStudy.tags}
                     createdAt={caseStudy.createdAt}
                     slug={caseStudy.slug}
-                    username={safeUsername}
+                    username={username || displayUsername}
                   />
                 ))}
               </div>
@@ -154,7 +169,7 @@ const UserPortfolio = () => {
             <h2 className="text-3xl font-bold mb-8">About Me</h2>
             
             <div className="prose max-w-none">
-              <p className="text-lg mb-6">{portfolioUser.bio}</p>
+              <p className="text-lg mb-6">{portfolioUser.bio || "Welcome to my portfolio showcase. I'm passionate about creating amazing work and sharing it with the world."}</p>
               
               {portfolioUser.location && (
                 <div className="mb-6">
