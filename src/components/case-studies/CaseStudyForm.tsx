@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCaseStudyById, mockCaseStudies } from '@/data/mockData';
+import { CaseStudy } from '@/models/types';
 
 interface TimelineItem {
   title: string;
@@ -28,16 +29,17 @@ interface TestimonialItem {
 interface CaseStudyFormProps {
   editMode?: boolean;
   caseStudyId?: string;
+  initialValues?: CaseStudy;
 }
 
-const CaseStudyForm: React.FC<CaseStudyFormProps> = ({ editMode = false, caseStudyId }) => {
+const CaseStudyForm: React.FC<CaseStudyFormProps> = ({ editMode = false, caseStudyId, initialValues }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
 
   // Find case study for edit mode
-  const caseStudyToEdit = editMode && caseStudyId ? 
-    mockCaseStudies.find(cs => cs.id === caseStudyId) : undefined;
+  const caseStudyToEdit = initialValues || (editMode && caseStudyId ? 
+    mockCaseStudies.find(cs => cs.id === caseStudyId) : undefined);
 
   // Basic info state
   const [title, setTitle] = useState(caseStudyToEdit?.title || '');
