@@ -14,6 +14,9 @@ interface NavItem {
 const DashboardSidebar = () => {
   const location = useLocation();
   const { user } = useAuth();
+  
+  // Make sure we have a valid username to use
+  const username = user?.username || 'demo';
 
   const navItems: NavItem[] = [
     {
@@ -101,7 +104,7 @@ const DashboardSidebar = () => {
         </nav>
       </div>
       <div className="p-4 border-t border-border">
-        <Link to={`/${user?.username || 'demo'}`}>
+        <Link to={`/${username}`}>
           <Button variant="outline" size="sm" className="w-full">
             <svg
               xmlns="http://www.w3.org/2000/svg"

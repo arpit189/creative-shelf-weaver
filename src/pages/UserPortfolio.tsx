@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { getUserByUsername, getCaseStudiesByUserId, getPortfolioByUserId } from '@/data/mockData';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { mockUsers } from '@/data/mockData'; // Import mockUsers to use as fallback
 
 const UserPortfolio = () => {
   const { username } = useParams<{ username: string }>();
@@ -16,26 +17,15 @@ const UserPortfolio = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // If we're in demo mode, use the demo user
-  const portfolioUsername = username === 'demo' ? 'sarahdesigner' : username;
+  // Always default to demo user if no username is provided or if the username doesn't match any user
+  const safeUsername = username || 'demo';
   
-  // Get the user data based on the username
-  const portfolioUser = getUserByUsername(portfolioUsername || '');
+  // Get the user data based on the username - fallback to first demo user if not found
+  const portfolioUser = getUserByUsername(safeUsername) || mockUsers[0]; // Use first mock user as fallback
   const isOwner = currentUser?.id === portfolioUser?.id;
   
   useEffect(() => {
-    if (!portfolioUsername) {
-      setError('Portfolio not found');
-      setLoading(false);
-      return;
-    }
-    
-    if (!portfolioUser) {
-      setError('User not found');
-      setLoading(false);
-      return;
-    }
-    
+    // Always get a portfolio, either the real one or the demo
     const portfolio = getPortfolioByUserId(portfolioUser.id);
     
     // Set theme based on portfolio settings
@@ -44,7 +34,7 @@ const UserPortfolio = () => {
     }
     
     setLoading(false);
-  }, [portfolioUsername, portfolioUser, setTheme]);
+  }, [safeUsername, portfolioUser, setTheme]);
   
   if (loading) {
     return (
@@ -54,24 +44,7 @@ const UserPortfolio = () => {
     );
   }
   
-  if (error || !portfolioUser) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">Portfolio Not Found</h1>
-          <p className="text-muted-foreground">
-            The portfolio you're looking for doesn't exist or may have been moved.
-          </p>
-          <div className="mt-6">
-            <a href="/" className="text-primary hover:underline">
-              Return to Homepage
-            </a>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
+  // Get portfolio and case studies
   const portfolio = getPortfolioByUserId(portfolioUser.id);
   const caseStudies = getCaseStudiesByUserId(portfolioUser.id);
   
@@ -115,7 +88,7 @@ const UserPortfolio = () => {
               
               <div className="text-center md:text-left">
                 <h1 className="text-4xl md:text-5xl font-bold mb-4">{portfolioUser.name}</h1>
-                <p className="text-xl text-muted-foreground mb-6">{portfolio?.description}</p>
+                <p className="text-xl text-muted-foreground mb-6">{portfolio?.description || "Designer & Developer"}</p>
                 
                 <div className="flex flex-wrap gap-2">
                   {portfolio?.skills?.map((skill, index) => (
@@ -151,7 +124,7 @@ const UserPortfolio = () => {
                     tags={caseStudy.tags}
                     createdAt={caseStudy.createdAt}
                     slug={caseStudy.slug}
-                    username={portfolioUsername || ''}
+                    username={safeUsername}
                   />
                 ))}
               </div>

@@ -10,6 +10,9 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ showLoginLinks = true }) => {
   const { user, isAuthenticated, logout } = useAuth();
+  
+  // Make sure we have a valid username to use
+  const username = user?.username || 'demo';
 
   return (
     <header className="border-b border-border">
@@ -49,7 +52,7 @@ const Navbar: React.FC<NavbarProps> = ({ showLoginLinks = true }) => {
               <Link to="/dashboard">
                 <Button variant="outline" size="sm">Dashboard</Button>
               </Link>
-              <Link to={`/${user?.username || 'demo'}`}>
+              <Link to={`/${username}`}>
                 <Button variant="ghost" size="sm">View Portfolio</Button>
               </Link>
               <Button variant="ghost" size="sm" onClick={logout}>
