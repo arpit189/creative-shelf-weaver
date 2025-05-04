@@ -22,7 +22,7 @@ const EditCaseStudy = () => {
   
   return (
     <DashboardLayout title={`Edit: ${caseStudy.title}`}>
-      <CaseStudyForm editMode caseStudyId={caseStudy.id} />
+      <CaseStudyForm editMode caseStudyId={caseStudy.id} initialValues={caseStudy} />
     </DashboardLayout>
   );
 };

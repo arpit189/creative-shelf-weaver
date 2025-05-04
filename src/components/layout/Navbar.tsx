@@ -49,7 +49,7 @@ const Navbar: React.FC<NavbarProps> = ({ showLoginLinks = true }) => {
               <Link to="/dashboard">
                 <Button variant="outline" size="sm">Dashboard</Button>
               </Link>
-              <Link to={`/${user?.username}`}>
+              <Link to={`/${user?.username || 'demo'}`}>
                 <Button variant="ghost" size="sm">View Portfolio</Button>
               </Link>
               <Button variant="ghost" size="sm" onClick={logout}>

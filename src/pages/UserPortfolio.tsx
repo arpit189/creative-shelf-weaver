@@ -16,11 +16,15 @@ const UserPortfolio = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const portfolioUser = getUserByUsername(username || '');
+  // If we're in demo mode, use the demo user
+  const portfolioUsername = username === 'demo' ? 'sarahdesigner' : username;
+  
+  // Get the user data based on the username
+  const portfolioUser = getUserByUsername(portfolioUsername || '');
   const isOwner = currentUser?.id === portfolioUser?.id;
   
   useEffect(() => {
-    if (!username) {
+    if (!portfolioUsername) {
       setError('Portfolio not found');
       setLoading(false);
       return;
@@ -40,7 +44,7 @@ const UserPortfolio = () => {
     }
     
     setLoading(false);
-  }, [username, portfolioUser, setTheme]);
+  }, [portfolioUsername, portfolioUser, setTheme]);
   
   if (loading) {
     return (
@@ -147,7 +151,7 @@ const UserPortfolio = () => {
                     tags={caseStudy.tags}
                     createdAt={caseStudy.createdAt}
                     slug={caseStudy.slug}
-                    username={username || ''}
+                    username={portfolioUsername || ''}
                   />
                 ))}
               </div>
