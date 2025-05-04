@@ -169,7 +169,6 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({ media = [], onChange }) => 
                     placeholder="Caption"
                     value={item.caption || ''}
                     onChange={(e) => handleCaptionChange(item.id, e.target.value)}
-                    size="sm"
                   />
                 </div>
               </Card>
